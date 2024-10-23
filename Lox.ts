@@ -8,12 +8,30 @@ class Lox {
       try {
         const data = await Deno.readTextFile(filePath);
         console.log("File data: ", data);
-      } catch (error) {
-      }
+      } catch (error) {}
       console.log("running file");
     } else {
-      console.log("run repl");
+      this.runPrompt();
     }
+  }
+
+  static async runPrompt(): Promise<void> {
+    const decoder = new TextDecoder();
+    const encoder = new TextEncoder();
+    const buffer = new Uint8Array(1024);
+
+    while (true) {
+      await Deno.stdout.write(encoder.encode(">"));
+
+      const n = <number>await Deno.stdin.read(buffer);
+      if (n === 1) break;
+
+      const input = decoder.decode(buffer.subarray(0, n)).trim();
+      if (input === "exit") break;
+
+      console.log(input);
+    }
+    Deno.exit(64);
   }
 }
 
