@@ -2,7 +2,7 @@ class Lox {
   static async main(args: string[]) {
     if (args.length > 1) {
       console.log("Usage: tlox [script]");
-      Deno.exit(65);
+      Deno.exit(64);
     } else if (args.length === 1) {
       const filePath = args[0];
       try {
@@ -33,6 +33,16 @@ class Lox {
     }
     Deno.exit(64);
   }
+
+  static error(line: number, message: string): void {
+    this.report(line, "", message);
+  }
+
+  static report(line: number, where: string, message: string): void {
+    console.error(`[line ${line}] Error ${where}: ${message}`);
+  }
 }
 
 Lox.main(Deno.args);
+
+export default Lox;

@@ -1,5 +1,6 @@
 import Token from "./Token";
 import TokenType from "./TokenType";
+import Lox from "./Lox";
 
 class Scanner {
   private source: string;
@@ -55,6 +56,9 @@ class Scanner {
       case "*":
         this.addToken(TokenType.STAR);
         break;
+      default:
+        Lox.error(this.line, "Unexpected character.");
+        break;
     }
   }
 
@@ -71,3 +75,5 @@ class Scanner {
     return this.source.charAt(this.current++);
   }
 }
+
+export default Scanner;
