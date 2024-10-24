@@ -1,4 +1,6 @@
 class Lox {
+  static hadError = false;
+
   static async main(args: string[]) {
     if (args.length > 1) {
       console.log("Usage: tlox [script]");
@@ -29,10 +31,13 @@ class Lox {
       const input = decoder.decode(buffer.subarray(0, n)).trim();
       if (input === "exit") break;
 
-      console.log(input);
+      console.log(input); //implement run function
+      this.hadError = false;
     }
     Deno.exit(64);
   }
+
+  //implement runFile function + error
 
   static error(line: number, message: string): void {
     this.report(line, "", message);
@@ -40,6 +45,7 @@ class Lox {
 
   static report(line: number, where: string, message: string): void {
     console.error(`[line ${line}] Error ${where}: ${message}`);
+    this.hadError = true;
   }
 }
 
