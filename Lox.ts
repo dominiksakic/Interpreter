@@ -1,3 +1,6 @@
+import Scanner from "./Scanner";
+import Token from "./Token";
+
 class Lox {
   static hadError = false;
 
@@ -9,7 +12,7 @@ class Lox {
       const filePath = args[0];
       try {
         const data = await Deno.readTextFile(filePath);
-        console.log("File data: ", data);
+        this.run(data);
       } catch (error) {}
       console.log("running file");
     } else {
@@ -31,14 +34,20 @@ class Lox {
       const input = decoder.decode(buffer.subarray(0, n)).trim();
       if (input === "exit") break;
 
-      console.log(input); //implement run function
+      this.run(input);
       this.hadError = false;
     }
     Deno.exit(64);
   }
 
-  //implement runFile function + error
+  static run(source: string): void {
+    const scanner = new Scanner(source);
+    const tokens: Token[] = scanner.scanTokens();
 
+    for (const token of tokens) {
+      console.log(token);
+    }
+  }
   static error(line: number, message: string): void {
     this.report(line, "", message);
   }
