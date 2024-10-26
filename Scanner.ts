@@ -94,6 +94,8 @@ class Scanner {
       case "/":
         if (this.match("/")) {
           while (this.peek() != "\n" && !this.isAtEnd()) this.advance();
+        } else if (this.match("*")) {
+          this.multiLineComment();
         } else {
           this.addToken(TokenType.SLASH);
         }
@@ -161,7 +163,7 @@ class Scanner {
 
   private string() {
     while (this.peek() !== '"' && !this.isAtEnd()) {
-      if (this.peek() == "\n") this.line++;
+      if (this.peek() === "\n") this.line++;
       this.advance();
     }
     if (this.isAtEnd()) {
@@ -206,6 +208,23 @@ class Scanner {
 
   private isAlphaNumeric(char: string) {
     return this.isAlpha(char) || this.isDigit(char);
+  }
+
+  private multiLineComment() {
+    while (
+      !(this.peek() === "*" && this.peekNext() === "*/") &&
+      !this.isAtEnd()
+    ) {
+      if (this.peek() === "\n") this.line++;
+      this.advance();
+    }
+
+    if (this.isAtEnd()) {
+      Lox.error(this.line, "Unterminated Comment");
+    }
+
+    this.advance();
+    this.advance();
   }
 }
 
