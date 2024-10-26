@@ -72,6 +72,13 @@ class Scanner {
           this.match(`=`) ? TokenType.GREATER_EQUAL : TokenType.GREATER,
         );
         break;
+      case "/":
+        if (this.match("/")) {
+          while (this.peek() != "\n" && !this.isAtEnd()) this.advance();
+        } else {
+          this.addToken(TokenType.SLASH);
+        }
+        break;
       default:
         Lox.error(this.line, "Unexpected character.");
         break;
@@ -97,6 +104,11 @@ class Scanner {
 
     this.current++;
     return true;
+  }
+
+  private peek() {
+    if (this.isAtEnd()) return "\0";
+    return this.source.charAt(this.current);
   }
 }
 
