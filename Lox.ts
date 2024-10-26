@@ -1,5 +1,5 @@
-import Scanner from "./Scanner";
-import Token from "./Token";
+import Scanner from "./Scanner.ts";
+import Token from "./Token.ts";
 
 class Lox {
   static hadError = false;
@@ -58,6 +58,5 @@ class Lox {
   }
 }
 
-Lox.main(Deno.args);
-
 export default Lox;
+Lox.main(Deno.args);
