@@ -9,6 +9,25 @@ class Scanner {
   private current: number = 0;
   private line: number = 1;
 
+  keywords: Map<string, TokenType> = new Map([
+    ["and", TokenType.AND],
+    ["class", TokenType.CLASS],
+    ["else", TokenType.ELSE],
+    ["false", TokenType.FALSE],
+    ["for", TokenType.FOR],
+    ["fun", TokenType.FUN],
+    ["if", TokenType.IF],
+    ["nil", TokenType.NIL],
+    ["or", TokenType.OR],
+    ["print", TokenType.PRINT],
+    ["return", TokenType.RETURN],
+    ["super", TokenType.SUPER],
+    ["this", TokenType.THIS],
+    ["true", TokenType.TRUE],
+    ["var", TokenType.VAR],
+    ["while", TokenType.WHILE],
+  ]);
+
   constructor(source: string) {
     this.source = source;
   }
@@ -92,6 +111,8 @@ class Scanner {
       default:
         if (this.isDigit(c)) {
           this.number();
+        } else if (this.isAlpha(c)) {
+          this.identifier();
         } else {
           Lox.error(this.line, "Unexpected character.");
           break;
@@ -130,6 +151,14 @@ class Scanner {
     return this.source.charAt(this.current + 1);
   }
 
+  private identifier() {
+    while (this.isAlphaNumeric(this.peek())) this.advance();
+
+    const text: string = this.source.substring(this.start, this.current);
+    const type: TokenType = this.keywords.get(text) ?? TokenType.IDENTIFIER;
+    this.addToken(type);
+  }
+
   private string() {
     while (this.peek() !== '"' && !this.isAtEnd()) {
       if (this.peek() == "\n") this.line++;
@@ -165,6 +194,18 @@ class Scanner {
 
   private isDigit(char: string) {
     return char >= "0" && char <= "9";
+  }
+
+  private isAlpha(char: string) {
+    return (
+      (char >= "a" && char <= "z") ||
+      (char >= "A" && char <= "Z") ||
+      char === "_"
+    );
+  }
+
+  private isAlphaNumeric(char: string) {
+    return this.isAlpha(char) || this.isDigit(char);
   }
 }
 
