@@ -211,20 +211,26 @@ class Scanner {
   }
 
   private multiLineComment() {
-    while (
-      !(this.peek() === "*" && this.peekNext() === "*/") &&
-      !this.isAtEnd()
-    ) {
-      if (this.peek() === "\n") this.line++;
-      this.advance();
-    }
+    let nestedComment: number = 1;
 
-    if (this.isAtEnd()) {
+    while (nestedComment > 0 && !this.isAtEnd()) {
+      if (this.peek() === "\n") this.line++;
+
+      if (this.peek() === "/" && this.peekNext() === "*") {
+        this.advance();
+        this.advance();
+        nestedComment++;
+      } else if (this.peek() === "*" && this.peekNext() === "/") {
+        this.advance();
+        this.advance();
+        nestedComment--;
+      } else {
+        this.advance();
+      }
+    }
+    if (nestedComment > 0) {
       Lox.error(this.line, "Unterminated Comment");
     }
-
-    this.advance();
-    this.advance();
   }
 }
 
