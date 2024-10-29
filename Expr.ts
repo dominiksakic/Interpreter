@@ -65,5 +65,4 @@ class UnaryExpr extends Expr {
   }
 }
 
-export default { BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr };
-
+export { Visitor, Expr, BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr };
