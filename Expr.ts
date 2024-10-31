@@ -41,8 +41,8 @@ class GroupingExpr extends Expr {
 }
 
 class LiteralExpr extends Expr {
-  value: Object;
-  constructor(value: Object) {
+  value: any;
+  constructor(value: any) {
     super();
     this.value = value;
   }
