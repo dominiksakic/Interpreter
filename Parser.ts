@@ -1,13 +1,38 @@
-import TokenType from "./TokenType";
-import Token from "./Token";
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr } from "./Expr";
+import TokenType from "./TokenType.ts";
+import Token from "./Token.ts";
+import {
+  BinaryExpr,
+  Expr,
+  GroupingExpr,
+  LiteralExpr,
+  UnaryExpr,
+} from "./Expr.ts";
+import Lox from "./main.ts";
+
+class ParseError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.message = "ParseError";
+    Object.setPrototypeOf(this, ParseError.prototype);
+  }
+}
 
 class Parser {
   current: number = 0;
   tokens: Token[];
-
   constructor(tokens: Token[]) {
     this.tokens = tokens;
+  }
+
+  parse(): Expr | null {
+    try {
+      return this.expression();
+    } catch (error) {
+      if (error instanceof ParseError) {
+        return null;
+      }
+      throw error;
+    }
   }
 
   private match(...types: TokenType[]) {
@@ -99,9 +124,17 @@ class Parser {
 
     if (this.match(TokenType.LEFT_PAREN)) {
       let expr: Expr = this.expression();
-      //this.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
+      this.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
       return new GroupingExpr(expr);
     }
+
+    throw this.error(this.peek(), "Expect expression.");
+  }
+
+  private consume(type: TokenType, message: string): Token {
+    if (this.check(type)) return this.advance();
+
+    throw this.error(this.peek(), message);
   }
 
   private check(type: TokenType): boolean {
@@ -125,4 +158,33 @@ class Parser {
   private previous() {
     return this.tokens[this.current - 1];
   }
+
+  private error(token: Token, message: string) {
+    Lox.parseError(token, message);
+    return new ParseError();
+  }
+
+  private synchronize() {
+    this.advance();
+
+    while (!this.isAtEnd()) {
+      if (this.previous().type === TokenType.SEMICOLON) return;
+
+      switch (this.peek().type) {
+        case TokenType.CLASS:
+        case TokenType.FUN:
+        case TokenType.VAR:
+        case TokenType.FOR:
+        case TokenType.IF:
+        case TokenType.WHILE:
+        case TokenType.PRINT:
+        case TokenType.RETURN:
+          return;
+      }
+
+      this.advance();
+    }
+  }
 }
+
+export default Parser;

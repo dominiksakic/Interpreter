@@ -34,19 +34,5 @@ class AstPrinter implements Visitor<string> {
   private parenthesize(name: string, ...exprs: Expr[]): string {
     return `(${name} ${exprs.map((expr) => this.print(expr)).join(" ")})`;
   }
-
-  public static main() {
-    const expression = new BinaryExpr(
-      new UnaryExpr(
-        new Token(TokenType.MINUS, "-", null, 1),
-        new LiteralExpr(123),
-      ),
-      new Token(TokenType.STAR, "*", null, 1),
-      new GroupingExpr(new LiteralExpr(45.67)),
-    );
-
-    console.log(new AstPrinter().print(expression));
-  }
 }
-AstPrinter.main();
 export default AstPrinter;
