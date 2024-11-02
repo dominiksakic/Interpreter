@@ -1,4 +1,4 @@
-import Token from "./Token";
+import Token from "./Token.ts";
 
 class RuntimeError extends Error {
   token: Token;

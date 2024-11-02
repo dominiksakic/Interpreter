@@ -3,9 +3,12 @@ import Scanner from "./Scanner.ts";
 import Token from "./Token.ts";
 import TokenType from "./TokenType.ts";
 import AstPrinter from "./util/ASTPrinter.ts";
-
+import RuntimeError from "./RuntimeError.ts";
+import Interpreter from "./Interpreters.ts";
 class Lox {
+  static interpreter: Interpreter = new Interpreter();
   static hadError = false;
+  static hadRuntimeError = false;
 
   static async main(args: string[]) {
     if (args.length > 1) {
@@ -53,17 +56,20 @@ class Lox {
       return;
     }
 
-    console.log(new AstPrinter().print(expression));
+    this.interpreter.interpret(expression);
   }
   static error(line: number, message: string): void {
     this.report(line, "", message);
   }
 
+  static runtimeError(error: RuntimeError) {
+    console.error(error.message + "\n[line " + error.token.line + "]");
+    this.hadRuntimeError = true;
+  }
   static report(line: number, where: string, message: string): void {
     console.error(`[line ${line}] Error ${where}: ${message}`);
     this.hadError = true;
   }
-
   static parseError(token: Token, message: string) {
     if (token.type === TokenType.EOF) {
       this.report(token.line, " at end", message);

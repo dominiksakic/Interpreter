@@ -9,7 +9,7 @@ import {
 import RuntimeError from "./RuntimeError.ts";
 import Token from "./Token.ts";
 import TokenType from "./TokenType.ts";
-
+import Lox from "./main.ts";
 export type Value = null | string | number | boolean;
 
 class Interpreter implements Visitor<Value> {
@@ -55,7 +55,7 @@ class Interpreter implements Visitor<Value> {
         return Number(left) - Number(right);
       case TokenType.SLASH:
         this.checkNumberOperands(expr.operator, left, right);
-        if (right === 0)
+        if (Number(right) === 0)
           throw new RuntimeError(expr.operator, "Division by zero.");
         return Number(left) / Number(right);
       case TokenType.STAR:
@@ -106,6 +106,29 @@ class Interpreter implements Visitor<Value> {
     if (a === null && b === null) return true;
     if (a === null) return false;
     return a === b;
+  }
+
+  private stringify(object: Value): string {
+    if (object == null) return "nil";
+
+    if (typeof object === "number") {
+      const text = object.toString();
+      if (text.endsWith(".0")) {
+        return text.substring(0, text.length - 2);
+      }
+      return text;
+    }
+
+    return object.toString();
+  }
+
+  interpret(expr: Expr) {
+    try {
+      let value = this.evaluate(expr);
+      console.log(this.stringify(value));
+    } catch (error) {
+      Lox.runtimeError(error);
+    }
   }
 }
 
