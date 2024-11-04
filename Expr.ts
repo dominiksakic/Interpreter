@@ -65,4 +65,27 @@ class UnaryExpr extends Expr {
   }
 }
 
-export { Visitor, Expr, BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr };
+class StmtExpr {
+  expression: Expr;
+  constructor(expression: Expr) {
+    this.expression = expression;
+  }
+}
+
+class PrintExpr {
+  expression: Expr;
+  constructor(expression: Expr) {
+    this.expression = expression;
+  }
+}
+
+export {
+  StmtExpr,
+  PrintExpr,
+  Visitor,
+  Expr,
+  BinaryExpr,
+  GroupingExpr,
+  LiteralExpr,
+  UnaryExpr,
+};
