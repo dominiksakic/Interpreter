@@ -1,11 +1,11 @@
-import { Expr } from "./Expr";
+import { Expr } from "./Expr.ts";
 
-interface Visitor<T> {
+interface StmtVisitor<T> {
   visitPrintStmt(Print: Stmt): T;
   visitExprStmt(Expr: Stmt): T;
 }
 abstract class Stmt {
-  abstract accept<T>(visitor: Visitor<T>): T;
+  abstract accept<T>(visitor: StmtVisitor<T>): T;
 }
 
 class ExprStmt extends Stmt {
@@ -16,7 +16,7 @@ class ExprStmt extends Stmt {
     this.expression = expression;
   }
 
-  accept<T>(visitor: Visitor<T>): T {
+  accept<T>(visitor: StmtVisitor<T>): T {
     return visitor.visitExprStmt(this);
   }
 }
@@ -29,9 +29,9 @@ class PrintStmt extends Stmt {
     this.expression = expression;
   }
 
-  accept<T>(visitor: Visitor<T>): T {
+  accept<T>(visitor: StmtVisitor<T>): T {
     return visitor.visitPrintStmt(this);
   }
 }
 
-export { PrintStmt, ExprStmt, Stmt };
+export { PrintStmt, ExprStmt, Stmt, StmtVisitor };

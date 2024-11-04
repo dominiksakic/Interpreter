@@ -2,9 +2,10 @@ import Parser from "./Parser.ts";
 import Scanner from "./Scanner.ts";
 import Token from "./Token.ts";
 import TokenType from "./TokenType.ts";
-import AstPrinter from "./util/ASTPrinter.ts";
 import RuntimeError from "./RuntimeError.ts";
 import Interpreter from "./Interpreters.ts";
+import { Stmt } from "./Stmt.ts";
+
 class Lox {
   static interpreter: Interpreter = new Interpreter();
   static hadError = false;
@@ -50,13 +51,13 @@ class Lox {
     const scanner = new Scanner(source);
     const tokens: Token[] = scanner.scanTokens();
     const parser = new Parser(tokens);
-    const expression = parser.parse();
+    const statements: Stmt[] = parser.parse();
 
-    if (!expression) {
+    if (!statements) {
       return;
     }
 
-    this.interpreter.interpret(expression);
+    this.interpreter.interpret(statements);
   }
   static error(line: number, message: string): void {
     this.report(line, "", message);

@@ -10,9 +10,11 @@ import RuntimeError from "./RuntimeError.ts";
 import Token from "./Token.ts";
 import TokenType from "./TokenType.ts";
 import Lox from "./main.ts";
+import { ExprStmt, PrintStmt, Stmt, StmtVisitor } from "./Stmt.ts";
+
 export type Value = null | string | number | boolean;
 
-class Interpreter implements Visitor<Value> {
+class Interpreter implements Visitor<Value>, StmtVisitor<void> {
   private checkNumberOperand(operator: Token, operand: Value) {
     if (typeof operand === "number") return;
     throw new RuntimeError(operator, "Operand must be a Number.");
@@ -96,6 +98,19 @@ class Interpreter implements Visitor<Value> {
     return expr.accept(this);
   }
 
+  private execute(stmt: Stmt): void {
+    stmt.accept(this);
+  }
+
+  public visitExprStmt(stmt: ExprStmt): void {
+    this.evaluate(stmt.expression);
+  }
+
+  public visitPrintStmt(stmt: PrintStmt): void {
+    const value: Value = this.evaluate(stmt.expression);
+    console.log(this.stringify(value));
+  }
+
   private isTruthy(object: Value): boolean {
     if (object === null) return false;
     if (typeof object === "boolean") return Boolean(object);
@@ -122,10 +137,11 @@ class Interpreter implements Visitor<Value> {
     return object.toString();
   }
 
-  interpret(expr: Expr) {
+  interpret(statements: Stmt[]) {
     try {
-      let value = this.evaluate(expr);
-      console.log(this.stringify(value));
+      for (const statement of statements) {
+        this.execute(statement);
+      }
     } catch (error) {
       Lox.runtimeError(error);
     }

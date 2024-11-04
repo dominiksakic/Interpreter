@@ -8,6 +8,7 @@ import {
   UnaryExpr,
 } from "./Expr.ts";
 import Lox from "./main.ts";
+import { ExprStmt, PrintStmt, Stmt } from "./Stmt.ts";
 
 class ParseError extends Error {
   constructor(message?: string) {
@@ -24,15 +25,12 @@ class Parser {
     this.tokens = tokens;
   }
 
-  parse(): Expr | null {
-    try {
-      return this.expression();
-    } catch (error) {
-      if (error instanceof ParseError) {
-        return null;
-      }
-      throw error;
+  parse(): Stmt[] {
+    let statements: Stmt[] = [];
+    while (!this.isAtEnd()) {
+      statements.push(this.statement());
     }
+    return statements;
   }
 
   private match(...types: TokenType[]) {
@@ -48,6 +46,24 @@ class Parser {
 
   private expression(): Expr {
     return this.equality();
+  }
+
+  private statement(): Stmt {
+    if (this.match(TokenType.PRINT)) return this.printStatement();
+
+    return this.expressionStatement();
+  }
+
+  private printStatement(): Stmt {
+    let value = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
+    return new PrintStmt(value);
+  }
+
+  private expressionStatement(): Stmt {
+    let expr: Expr = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+    return new ExprStmt(expr);
   }
 
   private equality(): Expr {
