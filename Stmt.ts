@@ -34,4 +34,4 @@ class PrintStmt extends Stmt {
   }
 }
 
-export { PrintStmt, ExprStmt };
+export { PrintStmt, ExprStmt, Stmt };
