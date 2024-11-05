@@ -1,5 +1,5 @@
 import { Expr } from "./Expr.ts";
-
+import Token from "./Token.ts";
 interface StmtVisitor<T> {
   visitPrintStmt(Print: Stmt): T;
   visitExprStmt(Expr: Stmt): T;
@@ -36,10 +36,10 @@ class PrintStmt extends Stmt {
 }
 
 class VarStmt extends Stmt {
-  name: String;
-  initializer: Expr;
+  name: Token;
+  initializer: Expr | null;
 
-  constructor(name: String, initializer: Expr) {
+  constructor(name: Token, initializer: Expr | null) {
     super();
     this.name = name;
     this.initializer = initializer;

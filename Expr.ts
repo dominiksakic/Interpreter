@@ -81,9 +81,9 @@ class PrintExpr {
 }
 
 class VariableExpr extends Expr {
-  name: String;
+  name: Token;
 
-  constructor(name: string) {
+  constructor(name: Token) {
     super();
     this.name = name;
   }

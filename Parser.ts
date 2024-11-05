@@ -6,9 +6,10 @@ import {
   GroupingExpr,
   LiteralExpr,
   UnaryExpr,
+  VariableExpr,
 } from "./Expr.ts";
 import Lox from "./main.ts";
-import { ExprStmt, PrintStmt, Stmt } from "./Stmt.ts";
+import { ExprStmt, PrintStmt, Stmt, VarStmt } from "./Stmt.ts";
 
 class ParseError extends Error {
   constructor(message?: string) {
@@ -28,7 +29,7 @@ class Parser {
   parse(): Stmt[] {
     let statements: Stmt[] = [];
     while (!this.isAtEnd()) {
-      statements.push(this.statement());
+      statements.push(this.declaration());
     }
     return statements;
   }
@@ -48,6 +49,16 @@ class Parser {
     return this.equality();
   }
 
+  private declaration(): Stmt {
+    try {
+      if (this.match(TokenType.VAR)) return this.varDeclaration();
+
+      return this.statement();
+    } catch (ParseError) {
+      this.synchronize();
+    }
+  }
+
   private statement(): Stmt {
     if (this.match(TokenType.PRINT)) return this.printStatement();
 
@@ -58,6 +69,21 @@ class Parser {
     let value = this.expression();
     this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
     return new PrintStmt(value);
+  }
+
+  private varDeclaration(): Stmt {
+    let name: Token = this.consume(
+      TokenType.IDENTIFIER,
+      "Expect Variable name.",
+    );
+
+    let initializer: Expr | null = null;
+    if (this.match(TokenType.EQUAL)) {
+      initializer = this.expression();
+    }
+
+    this.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+    return new VarStmt(name, initializer);
   }
 
   private expressionStatement(): Stmt {
@@ -138,6 +164,10 @@ class Parser {
       return new LiteralExpr(this.previous().literal);
     }
 
+    if (this.match(TokenType.IDENTIFIER)) {
+      return new VariableExpr(this.previous());
+    }
+
     if (this.match(TokenType.LEFT_PAREN)) {
       let expr: Expr = this.expression();
       this.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
@@ -171,7 +201,7 @@ class Parser {
     return this.tokens[this.current];
   }
 
-  private previous() {
+  private previous(): Token {
     return this.tokens[this.current - 1];
   }
 
