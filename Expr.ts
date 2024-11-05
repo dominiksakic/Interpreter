@@ -6,6 +6,7 @@ interface Visitor<T> {
   visitGrouping(expr: GroupingExpr): T;
   visitLiteral(expr: LiteralExpr): T;
   visitUnary(expr: UnaryExpr): T;
+  visitVariable(expr: VariableExpr): T;
 }
 
 abstract class Expr {
@@ -79,6 +80,18 @@ class PrintExpr {
   }
 }
 
+class VariableExpr extends Expr {
+  name: String;
+
+  constructor(name: string) {
+    super();
+    this.name = name;
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitVariable(this);
+  }
+}
 export {
   StmtExpr,
   PrintExpr,
@@ -88,4 +101,5 @@ export {
   GroupingExpr,
   LiteralExpr,
   UnaryExpr,
+  VariableExpr,
 };
